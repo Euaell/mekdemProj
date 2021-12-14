@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+
+  <h1>Dormitory Placement</h1><br><br>				<!--main purpose of page-->
+  <a action="/dormApplication" href="dormApplication.ejs">Dormitory Application</a><br><br>				<!--link to access the first option-->
+  <a action="/dormPlacement" href="dormPlacement.ejs">Dormitory Placement</a><br><br>				<!--link to access the second option-->
+  <div>
+    <% if (placement !== null) { %>
+    <p>This will be your Dormitory for this semister. If you have any question please contact your proctor.</p>
+    
+    
+    <div>
+      <h3>Block Number</h3>
+      <p>#<%= placement.blockNumber %></p>
+    </div>
+    <div>
+      <h3>Dorm Number</h3>
+      <p>#<%= placement.roomNumber %></p>
+    </div>
+    <!-- <div>
+      <h3>Roommates</h3>
+    </div> -->
+    <% } else { %>
+    <p>No Dormitory information available.</p>
+    <% } %>
+  </div>
+</body>
+</html>

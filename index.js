@@ -72,11 +72,45 @@ app.get('/council' , authentication.isStudentLoggedIn ,(req , res)=> {
     let sql =  `select * from council`;
     connection.query(sql , (error , result) => {
         if (result !==undefined && result.length > 0 ) {
-        res.render('council' , {council: result})
+        res.render('council' , {council: result});
         }
         else 
         {
             res.render('council' , {council:0});
+        }
+     });
+});
+
+
+// Student service
+// Dormitory Application
+app.get('/placement' , authentication.isStudentLoggedIn ,(req , res)=> {
+    //req.userData.StudentID   holds the current logged in student id which is a string
+    //req.userData.FullName    holds the current logged in student full name
+    let adr = req.userData.StudentID;
+    let sql =  `select * from dormitory WHERE StudentD = ` +  mysql.escape(adr);
+    connection.query(sql , (error , result) => {
+        if (result !==undefined && result.length > 0 ) {
+            var adr0 = result[0].blockNumber;
+            var adr1 = result[0].roomNumber;
+            if(adr0 == null || adr1 == null){
+                var r = null;
+            }else {
+                var r = {
+                    blockNumber: adr0,
+                    roomNumber: adr1
+                }
+                console.log(r);
+            }                       
+            res.render("Dormitory/placement", {placement: r});
+            // var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
+            // connection.query(sql0, (error, result) => {
+            //     var
+            // });
+        }
+        else 
+        {
+            res.render('Dormitory/placement' , {placement: null});
         }
      });
 });
