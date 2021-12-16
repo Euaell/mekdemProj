@@ -3,34 +3,17 @@ const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const authentication = require('./middleware/authentication.js');
 const cookieParser = require('cookie-parser');
-const e = require('express');
+const connection = require("./dB/db.js");
+const studentService = require("./routes/studentService/dormitory/placement");
 
 const app = express();
-
 app.set('view engine' ,  'ejs');
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static('public'));
 
-const connection = mysql.createConnection({
-    host: "localhost" , 
-    user: "geek" , 
-    password: "1560" , 
-    database: "mekdemschoolportal"
-});
-
-connection.connect(
-    function(err){
-        if (err) console.log(err);
-        else  
-        {
-            app.listen(3000 , ()=>console.log("server running on port 3000"));
-            console.log("database connected successfully");
-        }
-    }
-);
-
+app.listen(3000 , ()=>console.log("server running on port 3000"));
 //ROUTES AND CONTROLLERS
 
 //login 
@@ -81,7 +64,7 @@ app.get('/council' , authentication.isStudentLoggedIn ,(req , res)=> {
 
 // Student service
     // Cost sharing - accountInfo
-const accountInfo = require("./routes/costSharing/accountInfo");
+const accountInfo = require("./routes/studentService/costsharing/accountInfo");
 app.use("/costSharing/accountInfo", accountInfo);
 
 // Student service
@@ -123,47 +106,48 @@ app.post('/costSharing/homeadr', authentication.isStudentLoggedIn, (req , res) =
 });
 
 // Dormitory placement
-app.get('/dormitory/placement', authentication.isStudentLoggedIn, authentication.isStudentLoggedIn ,(req , res)=> {
-    //req.userData.StudentID   holds the current logged in student id which is a string
-    //req.userData.FullName    holds the current logged in student full name
-    let adr = req.userData.StudentID;
-    let sql =  `select * from dormitory WHERE StudentD = ` +  mysql.escape(adr);
-    connection.query(sql , (error , result) => {
-        let r;
-        if (result !==undefined && result.length > 0 ) {
-            const adr0 = result[0].blockNumber;
-            const adr1 = result[0].roomNumber;
-            const adr2 = result[0].RequestStatus;
-            if (adr2 !== "denied"){
-                if (adr2 == "approved"){
-                    if(adr0 == null || adr1 == null){
-                        r = null;
-                    }else {
-                    var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
-                    connection.query(sql0, (error, result) => {
-                        // var
-                    });
-                        r = {
-                            dormStatus: adr2,
-                            blockNumber: adr0,
-                            roomNumber: adr1
-                        };
-                    }
-                } else{
-                    r = {
-                        dormStatus: adr2
-                    };
-                }
-            }
-            console.log(r);
-            res.render("Dormitory/placement", {placement: r});
-        }
-        else 
-        {
-            res.render('Dormitory/placement' , {placement: null});
-        }
-     });
-});
+app.use("/dormitory/placement", studentService);
+// app.get('/dormitory/placement', authentication.isStudentLoggedIn, (req , res)=> {
+//     //req.userData.StudentID   holds the current logged in student id which is a string
+//     //req.userData.FullName    holds the current logged in student full name
+//     let adr = req.userData.StudentID;
+//     let sql =  `select * from dormitory WHERE StudentD = ` +  mysql.escape(adr);
+//     connection.query(sql , (error , result) => {
+//         let r;
+//         if (result !==undefined && result.length > 0 ) {
+//             const adr0 = result[0].blockNumber;
+//             const adr1 = result[0].roomNumber;
+//             const adr2 = result[0].RequestStatus;
+//             if (adr2 !== "denied"){
+//                 if (adr2 == "approved"){
+//                     if(adr0 == null || adr1 == null){
+//                         r = null;
+//                     }else {
+//                     var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
+//                     connection.query(sql0, (error, result) => {
+//                         // var
+//                     });
+//                         r = {
+//                             dormStatus: adr2,
+//                             blockNumber: adr0,
+//                             roomNumber: adr1
+//                         };
+//                     }
+//                 } else{
+//                     r = {
+//                         dormStatus: adr2
+//                     };
+//                 }
+//             }
+//             console.log(r);
+//             res.render("Dormitory/placement", {placement: r});
+//         }
+//         else 
+//         {
+//             res.render('Dormitory/placement' , {placement: null});
+//         }
+//      });
+// });
 //Dormitory Application
 app.get('/dormitory/Application', authentication.isStudentLoggedIn, (req , res)=> {
     res.render('Dormitory/Application');
