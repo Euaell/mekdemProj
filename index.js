@@ -3,6 +3,7 @@ const mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const authentication = require('./middleware/authentication.js');
 const cookieParser = require('cookie-parser');
+const e = require('express');
 
 const app = express();
 
@@ -72,28 +73,40 @@ app.get('/council' , authentication.isStudentLoggedIn ,(req , res)=> {
     connection.query(sql, (error, result) => {
         if (result !==undefined && result.length > 0 ) {
         res.render('council', {council: result});
-        }
-        else 
-        {
+        } else {
             res.render('council', {council:0});
         }
      });
 });
 
+// Student service
+    // Cost sharing - accountInfo
+const accountInfo = require("./routes/costSharing/accountInfo");
+app.use("/costSharing/accountInfo", accountInfo);
 
 // Student service
     // Cost sharing - accountInfo
 app.get('/costSharing/accountInfo', authentication.isStudentLoggedIn, (req , res)=> {
-    res.render('costSharing/accountInfo');
+    res.render('costSharing/accountInfo', {msg: false});
 });
 app.post('/costSharing/accountInfo', authentication.isStudentLoggedIn, (req , res) => {
-    let sql = `select * from student`;
-    connection.query(sql, (error , result) => {
-        if (error){
-            return console.log(error.message);
-        }
-        
+    let adr = req.userData.StudentID;
+    let adr1 = req.body.accinfo;
+    let adr3 = req.body.foods;
+    let adr4 = req.body.dorms;
+    let adr5;
+    if(adr3 == undefined && adr4 == undefined) adr5 = "none";
+    else if(adr3 != undefined && adr4 == undefined) adr5 = "Food";
+    else if(adr3 == undefined && adr4 != undefined) adr5 = "Dorm";
+    else adr5 = "FoodAndDorm";
+    console.log(adr5);
+    let x = false;
+    let sql = `INSERT INTO costsharing (StudentCostSharing, AccountNumber, ServiceChoice) VALUES ("${adr}", "${adr1}", "${adr5}")`;
+    connection.query(sql, (err, result) => {
+        if(err) x = true;
+
     });
+    res.render('costSharing/accountInfo', {msg: x});
 });
 
     // Cost sharing - home address
@@ -121,12 +134,15 @@ app.get('/dormitory/placement', authentication.isStudentLoggedIn, authentication
             const adr0 = result[0].blockNumber;
             const adr1 = result[0].roomNumber;
             const adr2 = result[0].RequestStatus;
-            console.log(result);
             if (adr2 !== "denied"){
                 if (adr2 == "approved"){
                     if(adr0 == null || adr1 == null){
                         r = null;
                     }else {
+                    var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
+                    connection.query(sql0, (error, result) => {
+                        // var
+                    });
                         r = {
                             dormStatus: adr2,
                             blockNumber: adr0,
@@ -141,10 +157,6 @@ app.get('/dormitory/placement', authentication.isStudentLoggedIn, authentication
             }
             console.log(r);
             res.render("Dormitory/placement", {placement: r});
-            // var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
-            // connection.query(sql0, (error, result) => {
-            //     var
-            // });
         }
         else 
         {
@@ -156,9 +168,7 @@ app.get('/dormitory/placement', authentication.isStudentLoggedIn, authentication
 app.get('/dormitory/Application', authentication.isStudentLoggedIn, (req , res)=> {
     res.render('Dormitory/Application');
 });
-app.post('/Application', authentication.isStudentLoggedIn ,(req , res)=> {
-    //req.userData.StudentID   holds the current logged in student id which is a string
-    //req.userData.FullName    holds the current logged in student full name
+app.post('/dormitory/Application', authentication.isStudentLoggedIn ,(req , res)=> {
     let adr = req.userData.StudentID;
     let bdr1 = req.body.dorm1;
     let bdr2 = req.body.dorm2;
