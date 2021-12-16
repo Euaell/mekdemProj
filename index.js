@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const authentication = require('./middleware/authentication.js');
 const cookieParser = require('cookie-parser');
 const connection = require("./dB/db.js");
-const studentService = require("./routes/studentService/dormitory/placement");
+const studentServiceplacement = require("./routes/studentService/dormitory/placement");
+const studentServiceapplication = require("./routes/studentService/dormitory/application");
 
 const app = express();
 app.set('view engine' ,  'ejs');
@@ -106,62 +107,22 @@ app.post('/costSharing/homeadr', authentication.isStudentLoggedIn, (req , res) =
 });
 
 // Dormitory placement
-app.use("/dormitory/placement", studentService);
-// app.get('/dormitory/placement', authentication.isStudentLoggedIn, (req , res)=> {
-//     //req.userData.StudentID   holds the current logged in student id which is a string
-//     //req.userData.FullName    holds the current logged in student full name
+app.use("/dormitory/placement", studentServiceplacement);
+//Dormitory Application
+app.use("/dormitory/Application", studentServiceapplication);
+// app.get('/dormitory/Application', authentication.isStudentLoggedIn, (req , res)=> {
+//     res.render('Dormitory/Application');
+// });
+// app.post('/dormitory/Application', authentication.isStudentLoggedIn ,(req , res)=> {
 //     let adr = req.userData.StudentID;
-//     let sql =  `select * from dormitory WHERE StudentD = ` +  mysql.escape(adr);
+//     let bdr1 = req.body.dorm1;
+//     let bdr2 = req.body.dorm2;
+//     let bdr3 = req.body.dorm3;
+//     let sql = `INSERT INTO dormitoryreq (StuduentD, preferedComp1 , preferedComp2, preferedComp3) VALUES ("${req.userData.StudentID}", "${bdr1}", "${bdr2}", "${bdr3}")`;
 //     connection.query(sql , (error , result) => {
-//         let r;
-//         if (result !==undefined && result.length > 0 ) {
-//             const adr0 = result[0].blockNumber;
-//             const adr1 = result[0].roomNumber;
-//             const adr2 = result[0].RequestStatus;
-//             if (adr2 !== "denied"){
-//                 if (adr2 == "approved"){
-//                     if(adr0 == null || adr1 == null){
-//                         r = null;
-//                     }else {
-//                     var sql0 = `select * from dormitory WHERE blockNumber = ${adr0} AND roomNumber = ${adr1}`;
-//                     connection.query(sql0, (error, result) => {
-//                         // var
-//                     });
-//                         r = {
-//                             dormStatus: adr2,
-//                             blockNumber: adr0,
-//                             roomNumber: adr1
-//                         };
-//                     }
-//                 } else{
-//                     r = {
-//                         dormStatus: adr2
-//                     };
-//                 }
-//             }
-//             console.log(r);
-//             res.render("Dormitory/placement", {placement: r});
+//         if (error) {
+//             return console.error("error: " + error.message);
 //         }
-//         else 
-//         {
-//             res.render('Dormitory/placement' , {placement: null});
-//         }
+//         res.redirect("/dormitory/placement");
 //      });
 // });
-//Dormitory Application
-app.get('/dormitory/Application', authentication.isStudentLoggedIn, (req , res)=> {
-    res.render('Dormitory/Application');
-});
-app.post('/dormitory/Application', authentication.isStudentLoggedIn ,(req , res)=> {
-    let adr = req.userData.StudentID;
-    let bdr1 = req.body.dorm1;
-    let bdr2 = req.body.dorm2;
-    let bdr3 = req.body.dorm3;
-    let sql = `INSERT INTO dormitoryreq (StuduentD, preferedComp1 , preferedComp2, preferedComp3) VALUES ("${req.userData.StudentID}", "${bdr1}", "${bdr2}", "${bdr3}")`;
-    connection.query(sql , (error , result) => {
-        if (error) {
-            return console.error("error: " + error.message);
-        }
-        res.redirect("/dormitory/placement");
-     });
-});
