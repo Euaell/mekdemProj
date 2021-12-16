@@ -53,12 +53,11 @@ app.get('/home' , authentication.isStudentLoggedIn ,(req , res)=> {
 //council  - 
 app.use("/council", council);
 
-// Student service
+// Student service 
     // Cost sharing - accountInfo
 app.use("/costSharing/accountInfo", accountInfo);
     // Cost sharing - home address
 app.use("/costSharing/homeadr", homeadr);
-
 // Dormitory placement
 app.use("/dormitory/placement", studentServiceplacement);
 //Dormitory Application
