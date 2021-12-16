@@ -1,6 +1,6 @@
 const express = require("express");
-const authentication = require('C:/Users/euael/OneDrive/Desktop/Software Eng/PROJECT/pull/New folder/middleware/authentication.js');
-const connection = require("C:/Users/euael/OneDrive/Desktop/Software Eng/PROJECT/pull/New folder/dB/db");
+const authentication = require('../../../middleware/authentication');
+const connection = require("../../../dB/db");
 
 const council = express.Router();
 
