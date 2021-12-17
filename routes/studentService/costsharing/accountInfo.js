@@ -23,7 +23,6 @@ accountInfo.route("/")
     let sql = `INSERT INTO costsharing (StudentCostSharing, AccountNumber, ServiceChoice) VALUES ("${adr}", "${adr1}", "${adr5}")`;
     connection.query(sql, (err, result) => {
         if(err) x = true;
-
     });
     res.render('costSharing/accountInfo', {msg: x});
 });

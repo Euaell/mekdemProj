@@ -7,7 +7,7 @@ application.route("/")
 .get(authentication.isStudentLoggedIn, (req , res)=> {
     res.render('Dormitory/Application', {msg: undefined});
 })
-.post(authentication.isStudentLoggedIn ,(req , res)=> {
+.post(authentication.isStudentLoggedIn, (req, res) => {
     let adr = req.userData.StudentID;
     let bdr1 = req.body.dorm1;
     let bdr2 = req.body.dorm2;
@@ -22,6 +22,10 @@ application.route("/")
         }
         res.redirect("/dormitory/placement");
      });
+    sql = `UPDATE dormitory SET RequestStatus = "pending"`;
+    connection.query(sql, (error, result) => {
+        if(error) return console.log(error.message);
+    })
 });
 
 module.exports = application;
